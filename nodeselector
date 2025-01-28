@@ -1,0 +1,17 @@
+ kubectl label nodes ip-192-168-24-92.ec2.internal devops=class  
+#pod creation with lable(
+#node selector
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    devops: class
+
