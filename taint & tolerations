@@ -1,0 +1,21 @@
+# taint on node node1.
+#The taint has key key1, value value1, and taint effect NoSchedule.
+#This means that no pod will be able to schedule onto node1 unless it has a matching toleration.#
+kubectl taint nodes ip-192-168-24-92.ec2.internal key1=value1:NoSchedule
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "key1"
+    operator: "Equal"
+    value: "value1"
+    effect: "NoSchedule"
