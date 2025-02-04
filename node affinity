@@ -1,0 +1,23 @@
+# Choose one of your nodes, and add a label to i
+kubectl label nodes ip-192-168-24-92.ec2.internal key1=value1
+#requiredDuringSchedulingIgnoredDuringExecution 
+#node affinity,key1: valu1. This means that the pod will get scheduled only on a node that has a ksy1=value1 label
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: key1
+            operator: In
+            values:
+            - value1           
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: Always
