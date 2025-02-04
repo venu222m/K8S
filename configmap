@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+data:
+  course: "DevOps with cloud"
+  language: "telugu"
+  github: "https://github.com/venu222m/K8S/new/main"
+
+  #configmap with pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-config
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+    - configMapRef:
+        name: configmap
