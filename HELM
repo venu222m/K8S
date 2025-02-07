@@ -1,0 +1,79 @@
+# helm install in master
+helm deployment
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+  1.HELM INSTALL
+  2.CHART & Values IN devops folder
+  3.DEPLOYMENT SERVICE IN TEMPLATES
+  helm install devops . in devops
+  values version image modify
+  helm upgrade devops .
+  helm history devops
+  helm rollback devops 1
+  helm rollback devops 2
+
+
+#root@ip-172-31-37-71:~/devops# cat Chart.yaml
+apiVersion: v1
+name: nginx
+version: 0.0.1
+description: this is the helm implementation of nginx
+
+root@ip-172-31-37-71:~/devops# cat values.yaml
+deployment:
+  replicas: 3
+  imageVersion: mainline
+service:
+  nodePort: 32143
+
+root@ip-172-31-37-71:~/devops# cd templates
+root@ip-172-31-37-71:~/devops/templates# ll
+total 16
+drwxr-xr-x 2 root root 4096 Feb  4 12:30 ./
+drwxr-xr-x 3 root root 4096 Feb  4 12:33 ../
+-rw-r--r-- 1 root root  476 Feb  4 12:25 deployment.yaml
+-rw-r--r-- 1 root root  213 Feb  4 12:30 service.yaml
+
+root@ip-172-31-37-71:~/devops/templates# cat deployment.yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx
+  # these labels are deployment related labels
+  labels:
+    app: nginx
+    purpose: devops
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: nginx
+      purpose: devops
+  # pod definition
+  template:
+    metadata:
+      labels:
+        app: nginx
+        purpose: devops
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:{{ .Values.deployment.imageVersion }}
+
+----
+#root@ip-172-31-37-71:~/devops/templates# cat service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+ type: NodePort
+ selector:
+   app: nginx
+   purpose: devops
+ ports:
+ - protocol: TCP
+   port: 80 #service-port
+   nodePort: {{ .Values.service.nodePort }}
+===============================
