@@ -1,0 +1,131 @@
+https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/
+Dockerfile
+FROM nginx
+RUN rm -rf /usr/share/nginx/html/index.html
+RUN echo "<h1>Hello, I am from dev-1</h1>" > /usr/share/nginx/html/index.html
+=============dev1.restartpro.xyz
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dev1
+  # these labels are deployment related labels
+  labels:
+    app: dev1
+    purpose: ingress
+spec:
+  selector:
+    matchLabels:
+      app: dev1
+      purpose: ingress
+  # pod definition
+  template:
+    metadata:
+      labels:
+        app: dev1
+        purpose: ingress
+    spec:
+      containers:
+      - name: dev1
+        image: venutej220/dev1:v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev1
+spec:
+  selector:
+    app: dev1
+    purpose: ingress
+  ports:
+  - protocol: TCP
+    port: 80 #service-port
+    targetPort: 80 #target-port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev1
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=dev
+    alb.ingress.kubernetes.io/group.name: devops
+spec:
+  ingressClassName: alb
+  rules:
+  - host: "dev1.restartpro.xyz" # ALB Rule
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: dev1 # ALB Target group
+            port:
+              number: 80
+===============================dev2.restartpro.xyz
+Dockerfile
+FROM nginx
+RUN rm -rf /usr/share/nginx/html/index.html
+RUN echo "<h1>Hello, I am from dev-1</h1>" > /usr/share/nginx/html/index.html
+===
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dev2
+  # these labels are deployment related labels
+  labels:
+    app: dev2
+    purpose: ingress
+spec:
+  selector:
+    matchLabels:
+      app: dev2
+      purpose: ingress
+  # pod definition
+  template:
+    metadata:
+      labels:
+        app: dev2
+        purpose: ingress
+    spec:
+      containers:
+      - name: dev2
+        image: venutej220/dev2:v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev2
+spec:
+  selector:
+    app: dev2
+    purpose: ingress
+  ports:
+  - protocol: TCP
+    port: 80 #service-port
+    targetPort: 80 #target-port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev2
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=dev
+# this annotation is useful to keep only ALB under dev group. if you don't give this it will create another ALB
+    alb.ingress.kubernetes.io/group.name: devops
+spec:
+  ingressClassName: alb
+  rules:
+  - host: "dev2.restartpro.xyz" # ALB Rule
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: dev2 # ALB Target group
+            port:
+              number: 80
