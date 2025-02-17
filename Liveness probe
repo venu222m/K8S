@@ -1,0 +1,38 @@
+#https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+#LIVENESS PROBE
+#kubelet uses liveness probes to know when to restart a container. 
+#For example, liveness probes could catch a deadlock, where an application is running, but unable to make progress. 
+#Restarting a container in such a state can help to make the application more available despite bugs.
+#first 30 seconds of the container's life, there is a /tmp/healthy file. So during the first 30 seconds,
+#the command cat /tmp/healthy returns a success code. After 30 seconds, cat /tmp/healthy returns a failure code
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness
+spec:
+  containers:
+  - name: liveness
+    image:ngnix
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+#first 30 seconds of the container's life, there is a /tmp/healthy file. So during the first 30 seconds,
+#the command cat /tmp/healthy returns a success code. After 30 seconds, cat /tmp/healthy returns a failure code
+output:
+Normal   Pulled     53s                kubelet, node01    Successfully pulled image ngix
+Normal   Created    53s                kubelet, node01    Created container liveness
+Normal   Started    53s                kubelet, node01    Started container liveness
+Warning  Unhealthy  10s (x3 over 20s)  kubelet, node01    Liveness probe failed: cat: can't open '/tmp/healthy': No such file or directory
+Normal   Killing    10s                kubelet, node01    Container liveness failed liveness probe, will be restarted
+#output shows that RESTARTS has been incremented. Note that the RESTARTS counter increments as soon as a failed container comes back to the running state
