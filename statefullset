@@ -1,0 +1,80 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: expense
+  labels:
+    name: expense
+    environment: dev
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-headless
+  namespace: expense
+spec:
+  clusterIP: None # this is called headless service
+  selector:
+    component: mysql
+    project: devops
+    tier: 3tier
+  ports:
+  - protocol: TCP
+    port: 3306 #service-port
+    targetPort: 3306 #target-port
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:
+    component: mysql
+    project: devops
+    tier: 3tier
+  ports:
+  - protocol: TCP
+    port: 3306 #service-port
+    targetPort: 3306 #target-port
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: expense
+spec:
+  selector:
+    matchLabels:
+      # has to match .spec.template.metadata.labels
+      component: mysql
+      project: devops
+      tier: 3tier
+  serviceName: "mysql-headless" # provide headless service name
+  replicas: 2 # by default is 1
+  template:
+    metadata:
+      labels:
+       # has to match .spec.selector.matchLabels
+        component: mysql
+        project: devops
+        tier: 3tier 
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
+  # PVC declaration, it is mandatory
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "dynamic-ebs"
+      resources:
+        requests:
+          storage: 1G
