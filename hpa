@@ -1,3 +1,4 @@
+#https://spacelift.io/blog/kubernetes-hpa-horizontal-pod-autoscaler
 apiVersion: apps/v1
 kind: Deployment
 metadata:
