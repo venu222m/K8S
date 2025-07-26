@@ -29,7 +29,7 @@ metadata:
   name: efs-claim
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeName: efs-pv
   resources:
     requests:
