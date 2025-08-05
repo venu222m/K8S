@@ -1,0 +1,218 @@
+Absolutely! Here's a concrete guide to how Kubernetes (K8s) is used in DevOps/SRE roles, specifically tailored for 3.5+ years of experience, with:
+
+🔧 Real-time use cases
+
+🧪 CLI commands
+
+🧰 Responsibilities
+
+🎯 Interview Q&A
+
+✅ Where Kubernetes Is Used in DevOps/SRE
+Area	Real-Time Usage	Tools
+Container Orchestration	Deploying and scaling apps in containers	kubectl, Helm
+CI/CD Integration	Deploy apps via Azure DevOps, Jenkins, ArgoCD	K8s manifests, pipelines
+Observability	Monitor pods/nodes with Prometheus + Grafana	Prometheus, Loki
+Auto-healing	Replace crashed pods automatically	readinessProbe, livenessProbe
+Networking	Service discovery, ingress, internal routing	Services, Ingress, DNS
+Security	RBAC, network policies, secrets mgmt	RBAC YAMLs, Secrets, PSPs
+Rolling Updates	Zero-downtime deployments	kubectl rollout, strategy
+Scaling	Autoscaling pods & nodes	HPA, Cluster Autoscaler
+
+🧪 Common Real-Time kubectl Commands
+bash
+Copy
+Edit
+# Basic Setup
+kubectl config use-context <context>
+kubectl get nodes
+kubectl get pods -A
+
+# Deployment
+kubectl apply -f deployment.yaml
+kubectl rollout status deployment/myapp
+
+# Debugging
+kubectl logs pod-name
+kubectl exec -it pod-name -- /bin/bash
+
+# Scaling
+kubectl scale deployment myapp --replicas=5
+
+# Rollback
+kubectl rollout undo deployment/myapp
+🔁 Real-Time Kubernetes Responsibilities (SRE/DevOps)
+Write/maintain YAML for Deployments, Services, ConfigMaps
+
+Monitor K8s health (Pods, Nodes, API server)
+
+Integrate CI/CD pipelines (Azure DevOps, Jenkins, ArgoCD)
+
+Troubleshoot crash loops, DNS issues, PVC mounts
+
+Secure workloads with NetworkPolicies, Secrets, RBAC
+
+Manage Helm charts or Kustomize-based deployments
+
+Handle upgrades using kubeadm, kured, etc.
+
+🧰 Common Kubernetes Resources for You
+Resource	Purpose	Example
+Deployment	Rolling updates of stateless apps	Nginx, API
+StatefulSet	Stable ID & storage for stateful apps	DB, Kafka
+DaemonSet	Run pod on every node (logging, monitoring agents)	Fluentd, Node Exporter
+Service	Expose app internally	ClusterIP, NodePort
+Ingress	HTTP(S) routing + TLS	Nginx Ingress Controller
+ConfigMap/Secret	Config & sensitive data	ENV VARs, credentials
+HPA	Autoscale pods by CPU/memory	autoscaling/v2
+PV/PVC	Attach persistent storage	Azure Disk, AWS EBS
+
+🎯 Interview Questions & Answers (Kubernetes DevOps/SRE)
+✅ Q1: What happens when a pod crashes?
+A:
+Kubernetes will automatically try to restart the pod based on the restartPolicy. Logs can be checked with:
+
+bash
+Copy
+Edit
+kubectl logs <pod>
+Check events with:
+
+bash
+Copy
+Edit
+kubectl describe pod <pod>
+✅ Q2: How do you do zero-downtime deployment?
+A:
+Use a Deployment with rollingUpdate strategy:
+
+yaml
+Copy
+Edit
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+K8s spins up new pods before killing old ones.
+
+✅ Q3: What is liveness and readiness probe?
+A:
+
+Readiness Probe: When to start sending traffic.
+
+Liveness Probe: When to restart the container.
+Example:
+
+yaml
+Copy
+Edit
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+✅ Q4: How do you scale Kubernetes workloads?
+A:
+
+Manual:
+
+bash
+Copy
+Edit
+kubectl scale deployment myapp --replicas=5
+Auto:
+
+yaml
+Copy
+Edit
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+Uses CPU/Memory or custom metrics.
+
+✅ Q5: What is the difference between Deployment and StatefulSet?
+Feature	Deployment	StatefulSet
+Use case	Stateless apps	Stateful apps (DB)
+Pod names	Random	Fixed (pod-0, pod-1)
+Volume	Shared	One per pod
+Restart order	Any	Ordered
+
+✅ Q6: How do you expose a service in Kubernetes?
+A:
+
+ClusterIP – internal access only
+
+NodePort – external via node IP & port
+
+LoadBalancer – provision cloud load balancer
+
+Ingress – expose multiple services under one domain
+
+✅ Q7: How do you debug CrashLoopBackOff?
+A:
+
+kubectl describe pod <pod>
+
+Check exit code, env vars, volume mounts
+
+kubectl logs <pod>
+
+Run init pod manually if needed:
+
+bash
+Copy
+Edit
+kubectl run debug --image=myapp -- bash
+✅ Q8: What are namespaces?
+A:
+Namespaces logically isolate resources in a cluster. Good for separating:
+
+Environments (dev, qa, prod)
+
+Teams
+
+bash
+Copy
+Edit
+kubectl create namespace qa
+kubectl get pods -n qa
+✅ Q9: What is Helm? Why is it used?
+A:
+Helm is a package manager for Kubernetes. It helps in:
+
+Reusable templates (values.yaml)
+
+Version control of releases
+
+Easy rollback, dependency management
+
+bash
+Copy
+Edit
+helm install myapp ./mychart
+✅ Q10: How do you secure Kubernetes clusters?
+A:
+
+Use RBAC for role-based access
+
+PodSecurityPolicy or OPA Gatekeeper
+
+Use NetworkPolicies to restrict traffic
+
+Enable TLS for API server, ingress
+
+Use Secrets for sensitive data
+
+📌 Resume Points for Kubernetes (3.5+ yrs)
+Managed and deployed microservices using Kubernetes and Helm
+
+Configured HPA and rolling updates for zero downtime deployments
+
+Integrated Kubernetes workloads with CI/CD pipelines using Azure DevOps
+
+Implemented Ingress controllers with TLS for secure app routing
+
+Secured access using RBAC, Network Policies, and Secrets management
+
+Automated cluster upgrades and node draining during maintenance windows
