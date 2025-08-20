@@ -1,0 +1,35 @@
+1.step one eks setup
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: expense
+  region: us-east-1
+managedNodeGroups:
+- name: expense
+  instanceType: t3.micro
+  desiredCapacity: 3
+  spot: true
+
+  #open with vscode
+====================================
+1.	curl https://get.docker.com
+2.	t3.micro ubuntu 50gb volume
+2.Aws cli install
+3. Aws configure
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+##Download eksctl
+https://eksctl.io/getting-started/
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+sudo chmod 700 /usr/local/bin/eksctl
+eksctl version
+
+###################kubectl install########################################
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.31.2/2024-11-15/bin/linux/arm64/kubectl.sha256 not wrking
+curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
+sudo chmod +x ./kubectl
+sudo mv kubectl /usr/local/bin
+kubectl version 
