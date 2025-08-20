@@ -16,6 +16,10 @@ managedNodeGroups:
 1.	curl https://get.docker.com
 2.	t3.micro ubuntu 50gb volume
 2.Aws cli install
+apt install unzip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 3. Aws configure
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
