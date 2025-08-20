@@ -37,3 +37,62 @@ curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
 sudo chmod +x ./kubectl
 sudo mv kubectl /usr/local/bin
 kubectl version 
+##########################################################################helm install########################################################################
+root@ip-172-31-39-183:~# curl -fsSL -o get_helm.sh https://raw.githubusercontent                                                                             .com/helm/helm/main/scripts/get-helm-3
+root@ip-172-31-39-183:~# chmod 700 get_helm.sh
+root@ip-172-31-39-183:~# ./get_helm.sh
+Downloading https://get.helm.sh/helm-v3.18.6-linux-amd64.tar.gz
+Verifying checksum... Done.
+Preparing to install helm into /usr/local/bin
+helm installed into /usr/local/bin/helm
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++argocd install via helm repo++++++++++++++++++++++++++++++++++++++
+root@ip-172-31-39-183:~# helm repo add argo https://argoproj.github.io/argo-helm                                                                             
+helm repo update
+"argo" has been added to your repositories
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "argo" chart repository
+Update Complete. ⎈Happy Helming!⎈
+root@ip-172-31-39-183:~# helm install argocd argo/argo-cd -n argocd --create-nam                                                                             espace
+NAME: argocd
+LAST DEPLOYED: Wed Aug 20 08:42:27 2025
+NAMESPACE: argocd
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+---------------------------------------------------------------------------------------------------------------------
+NOTES:
+In order to access the server UI you have the following options:
+
+1. kubectl port-forward service/argocd-server -n argocd 8080:443
+
+    and then open the browser on http://localhost:8080 and accept the certificate
+
+2. enable ingress in the values file `server.ingress.enabled` and either
+      - Add the annotation for ssl passthrough: https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#option-1-ssl-passthrough
+      - Set the `configs.params."server.insecure"` in the values file and terminate SSL at your ingress: https://argo-cd.readthedocs.io/en/stable/operator-manua                                                                             l/ingress/#option-2-multiple-ingress-objects-and-hosts
+
+
+After reaching the UI the first time you can login with username: admin random password generated during the installation. You can find the password by                                                                              running:
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+(You should delete the initial secret afterwards as suggested by the Getting Started Guide: https://argo-cd.readthedocs.io/en/stable/getting_started/#4-ogin-us                                                                             ing-the-cli)
+===========================================================argocd pod===========================================================================
+root@ip-172-31-39-183:~# kubectl get pods -n argocd
+NAME                                               READY   STATUS    RESTARTS                                                                                AGE
+argocd-application-controller-0                    1/1     Running   0                                                                                       83s
+argocd-applicationset-controller-59f7fc666-9zh8k   1/1     Running   0                                                                                       83s
+argocd-dex-server-8b99cf66f-sw4sx                  1/1     Running   0                                                                                       83s
+argocd-notifications-controller-b7bf48757-4ftlg    1/1     Running   0                                                                                       83s
+argocd-redis-84897889d6-znkhv                      1/1     Running   0                                                                                       83s
+argocd-repo-server-77654bf79c-rpqcj                1/1     Running   0                                                                                       83s
+argocd-server-66bc5bd49b-j75vv                     1/1     Running   0                                                                                       83s
+=============================================================argodcd svc==============================================================================
+root@ip-172-31-39-183:~# kubectl get svc -n argocd
+NAME                               TYPE        CLUSTER-IP       EXTERNAL-IP   PO                                                                             RT(S)             AGE
+argocd-applicationset-controller   ClusterIP   10.100.190.111   <none>        70                                                                             00/TCP            2m7s
+argocd-dex-server                  ClusterIP   10.100.31.224    <none>        55                                                                             56/TCP,5557/TCP   2m7s
+argocd-redis                       ClusterIP   10.100.89.102    <none>        63                                                                             79/TCP            2m7s
+argocd-repo-server                 ClusterIP   10.100.160.99    <none>        80                                                                             81/TCP            2m7s
+argocd-server                      ClusterIP   10.100.96.118    <none>        80                                                                             /TCP,443/TCP      2m7s
+====================================================================================================================================================================
