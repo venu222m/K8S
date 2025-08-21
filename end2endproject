@@ -105,3 +105,5 @@ argocd-dex-server                  ClusterIP      10.100.17.161    <none>       
 argocd-redis                       ClusterIP      10.100.238.50    <none>                                                                    6379/TCP                     4m5s
 argocd-repo-server                 ClusterIP      10.100.169.160   <none>                                                                    8081/TCP                     4m5s
 argocd-server                      LoadBalancer   10.100.148.124   aa1372f1c37924b45a23618e46647118-1146107348.us-east-1.elb.amazonaws.com   80:32545/TCP,443:32649/TCP   4m5s
+
+#edit sg in lb then login with lb dns
