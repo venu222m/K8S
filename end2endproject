@@ -108,5 +108,36 @@ argocd-server                      LoadBalancer   10.100.148.124   aa1372f1c3792
 
 #edit sg in lb then login with lb dns
 allow traffic in sg 
-================================================
-https://github.com/venu222m/sample-nginx-deploy.git
+================================================login argocd
+root@ip-172-31-47-40:~# kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d; echo
+u will get pwd
+admin
+******(pwd) type login successfully
+==========================================================git structure
+sample-nginx-deploy/
+├── deployment.yaml
+├── service.yaml
+=================================================argocd app yaml================================
+
+
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/venu222m/sample-nginx-deploy.git   # 👈 your repo
+    targetRevision: main                                            # branch
+    path: .                                                         # folder in repo (root if manifests are there)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+===================================================================
