@@ -38,7 +38,7 @@ sudo chmod +x ./kubectl
 sudo mv kubectl /usr/local/bin
 kubectl version 
 ##########################################################################helm install########################################################################
-root@ip-172-31-39-183:~# curl -fsSL -o get_helm.sh https://raw.githubusercontent                                                                             .com/helm/helm/main/scripts/get-helm-3
+root@ip-172-31-39-183:~# curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 root@ip-172-31-39-183:~# chmod 700 get_helm.sh
 root@ip-172-31-39-183:~# ./get_helm.sh
 Downloading https://get.helm.sh/helm-v3.18.6-linux-amd64.tar.gz
@@ -52,7 +52,7 @@ helm repo update
 Hang tight while we grab the latest from your chart repositories...
 ...Successfully got an update from the "argo" chart repository
 Update Complete. ⎈Happy Helming!⎈
-root@ip-172-31-39-183:~# helm install argocd argo/argo-cd -n argocd --create-nam                                                                             espace
+root@ip-172-31-39-183:~# helm install argocd argo/argo-cd -n argocd --create-namespace
 NAME: argocd
 LAST DEPLOYED: Wed Aug 20 08:42:27 2025
 NAMESPACE: argocd
@@ -88,11 +88,20 @@ argocd-redis-84897889d6-znkhv                      1/1     Running   0          
 argocd-repo-server-77654bf79c-rpqcj                1/1     Running   0                                                                                       83s
 argocd-server-66bc5bd49b-j75vv                     1/1     Running   0                                                                                       83s
 =============================================================argodcd svc==============================================================================
-root@ip-172-31-39-183:~# kubectl get svc -n argocd
-NAME                               TYPE        CLUSTER-IP       EXTERNAL-IP   PO                                                                             RT(S)             AGE
-argocd-applicationset-controller   ClusterIP   10.100.190.111   <none>        70                                                                             00/TCP            2m7s
-argocd-dex-server                  ClusterIP   10.100.31.224    <none>        55                                                                             56/TCP,5557/TCP   2m7s
-argocd-redis                       ClusterIP   10.100.89.102    <none>        63                                                                             79/TCP            2m7s
-argocd-repo-server                 ClusterIP   10.100.160.99    <none>        80                                                                             81/TCP            2m7s
-argocd-server                      ClusterIP   10.100.96.118    <none>        80                                                                             /TCP,443/TCP      2m7s
-====================================================================================================================================================================
+root@ip-172-31-47-40:~# kubectl get svc -n argocd
+NAME                               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+argocd-applicationset-controller   ClusterIP   10.100.153.104   <none>        7000/TCP            3m31s
+argocd-dex-server                  ClusterIP   10.100.17.161    <none>        5556/TCP,5557/TCP   3m31s
+argocd-redis                       ClusterIP   10.100.238.50    <none>        6379/TCP            3m31s
+argocd-repo-server                 ClusterIP   10.100.169.160   <none>        8081/TCP            3m31s
+argocd-server                      ClusterIP   10.100.148.124   <none>        80/TCP,443/TCP      3m31s
+====================clusterip swith to lb================================================================================================
+root@ip-172-31-47-40:~# kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}' 
+service/argocd-server patched
+root@ip-172-31-47-40:~# kubectl get svc -n argocd
+NAME                               TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)                      AGE
+argocd-applicationset-controller   ClusterIP      10.100.153.104   <none>                                                                    7000/TCP                     4m5s
+argocd-dex-server                  ClusterIP      10.100.17.161    <none>                                                                    5556/TCP,5557/TCP            4m5s
+argocd-redis                       ClusterIP      10.100.238.50    <none>                                                                    6379/TCP                     4m5s
+argocd-repo-server                 ClusterIP      10.100.169.160   <none>                                                                    8081/TCP                     4m5s
+argocd-server                      LoadBalancer   10.100.148.124   aa1372f1c37924b45a23618e46647118-1146107348.us-east-1.elb.amazonaws.com   80:32545/TCP,443:32649/TCP   4m5s
