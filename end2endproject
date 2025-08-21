@@ -153,3 +153,27 @@ selfHeal: true →
 If someone changes things directly in the cluster (manual kubectl edit or kubectl apply), Argo CD will reset it back to what’s defined in Git.
 👉 Example: Someone scales your Nginx deployment from 2 → 5 pods using kubectl. Argo CD notices it doesn’t match Git (2 replicas) and restores it to 2.
 ========================================================================================================================================================
+============================================github webhook integration with argocd
+ Example: Someone scales your Nginx deployment from 2 → 5 pods using kubectl. Argo CD notices it doesn’t match Git (2 replicas) and restores it to 2
+
+1.https://aa1372f1c37924b45a23618e46647118-1146107348.us-east-1.elb.amazonaws.com/api/webhook
+1. Your Webhook URL
+
+Append /api/webhook to your LB URL:
+2. Configure GitHub Webhook (example)
+
+Go to your repo → Settings → Webhooks → Add webhook
+3.Content type = application/json
+
+4.Select "Just the push event"
+
+root@ip-172-31-47-40:~# # argocd-secret webhook config
+kubectl -n argocd patch secret argocd-secret \
+  -p '{"stringData": {"webhook.github.secret": "my-webhook-secret123"}}'
+secret/argocd-secret patched
+Generate a random secret string (example: my-webhook-secret123).
+
+Paste it in the Secret field in GitHub.
+then save it
+==================================================================================webhook integration=======================
+
