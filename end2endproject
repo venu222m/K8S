@@ -107,3 +107,6 @@ argocd-repo-server                 ClusterIP      10.100.169.160   <none>       
 argocd-server                      LoadBalancer   10.100.148.124   aa1372f1c37924b45a23618e46647118-1146107348.us-east-1.elb.amazonaws.com   80:32545/TCP,443:32649/TCP   4m5s
 
 #edit sg in lb then login with lb dns
+allow traffic in sg 
+================================================
+https://github.com/venu222m/sample-nginx-deploy.git
