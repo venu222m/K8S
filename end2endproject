@@ -140,4 +140,16 @@ spec:
     automated:
       prune: true
       selfHeal: true
-===================================================================
+===================================================================notes argocd
+syncPolicy → tells Argo CD how to keep your cluster in sync with Git.
+
+automated: → means Argo CD will auto-sync changes from Git to Kubernetes without you pressing “Sync” in the UI.
+
+prune: true →
+If something exists in the cluster but is deleted from Git, Argo CD will also delete it from the cluster.
+👉 Example: You had nginx-service.yaml in Git but removed it → Argo CD deletes that Service from the cluster automatically.
+
+selfHeal: true →
+If someone changes things directly in the cluster (manual kubectl edit or kubectl apply), Argo CD will reset it back to what’s defined in Git.
+👉 Example: Someone scales your Nginx deployment from 2 → 5 pods using kubectl. Argo CD notices it doesn’t match Git (2 replicas) and restores it to 2.
+========================================================================================================================================================
