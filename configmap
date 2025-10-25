@@ -8,6 +8,7 @@ data:
   github: "https://github.com/venu222m/K8S/new/main"
 
   #configmap with pod
+---
 apiVersion: v1
 kind: Pod
 metadata:
