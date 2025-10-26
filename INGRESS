@@ -155,3 +155,52 @@ spec:
             name: dev2 # ALB Target group
             port:
               number: 80
+==================================================To change your Ingress from port 80 (HTTP) to port 443 (HTTPS),
+you need to:
+
+Add TLS configuration under the spec section.
+
+Change the backend port (if your service listens on 443).
+
+Ensure your ALB is configured for HTTPS with a valid SSL certificate (from ACM).
+
+Here’s your corrected Ingress manifest updated for port 443 / HTTPS:
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev1
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=dev
+    alb.ingress.kubernetes.io/group.name: devops
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:123456789012:certificate/your-acm-cert-id
+spec:
+  ingressClassName: alb
+  tls:
+  - hosts:
+      - dev1.restartpro.xyz
+    secretName: dev1-tls-secret  # (Optional if ALB handles SSL via ACM)
+  rules:
+  - host: "dev1.restartpro.xyz"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: dev1
+            port:
+              number: 80   # keep 80 if your service listens on 80; ALB terminates HTTPS
+
+🔍 Explanation:
+
+alb.ingress.kubernetes.io/listen-ports → tells ALB to listen on port 443 (HTTPS).
+
+alb.ingress.kubernetes.io/certificate-arn → must point to your AWS ACM certificate for dev1.restartpro.xyz.
+
+tls: → optional if SSL termination happens at the ALB. You can include it if you also use K8s secrets.
+
+Backend port.number: 80 remains as-is because ALB does SSL termination — it decrypts HTTPS traffic and forwards plain HTTP (port 80) to your service
