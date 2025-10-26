@@ -52,7 +52,7 @@ spec:
       labels:
         app: dev1
     spec:
-      serviceAccountName: ecr-access-sa   # 🔑 IAM role linked
+      serviceAccountName: ecr-access-sa   # 🔑 IAM role linked  #imp
       containers:
       - name: dev1
         image: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/dev1:latest
