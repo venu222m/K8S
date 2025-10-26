@@ -1,0 +1,144 @@
+Use IRSA (IAM Roles for Service Accounts) — not imagePullSecrets — for pulling private ECR images in Kubernetes (EKS).
+
+✅ Step-by-Step: Recommended (IRSA) Method
+1️⃣ Create IAM Policy to Allow ECR Pull
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+
+Save it as ECRPullPolicy in the AWS console or CLI.
+
+2️⃣ Create IAM Role + K8s Service Account (via eksctl)
+eksctl create iamserviceaccount \
+  --name ecr-access-sa \
+  --namespace default \
+  --cluster your-cluster-name \
+  --attach-policy-arn arn:aws:iam::123456789012:policy/ECRPullPolicy \
+  --approve
+
+✅ This automatically creates:
+
+A K8s service account named ecr-access-sa
+
+An IAM role bound to it via IRSA
+==============================================private ecr image pull pod .yaml
+3️⃣ Use It in Your Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev1
+  labels:
+    app: dev1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dev1
+  template:
+    metadata:
+      labels:
+        app: dev1
+    spec:
+      serviceAccountName: ecr-access-sa   # 🔑 IAM role linked
+      containers:
+      - name: dev1
+        image: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/dev1:latest
+        ports:
+        - containerPort: 80
+==============================================Giving S3 access to a Kubernetes Pod===================================================
+Recommended Method: IRSA (IAM Role for Service Account)
+Step 1️⃣ — Create an IAM Policy for S3 Access
+
+Create a least-privilege policy for your use case.
+
+Example: Full S3 bucket access (adjust as needed)
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::my-dev-bucket"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::my-dev-bucket/*"
+    }
+  ]
+}
+
+
+Save it as S3AccessPolicy.
+
+Step 2️⃣ — Create a Service Account with IRSA
+eksctl create iamserviceaccount \
+  --name s3-access-sa \
+  --namespace default \
+  --cluster your-cluster-name \
+  --attach-policy-arn arn:aws:iam::123456789012:policy/S3AccessPolicy \
+  --approve
+
+
+This will:
+
+Create a K8s service account (s3-access-sa)
+
+Link it to a new IAM role with that S3 policy
+
+Step 3️⃣ — Reference That Service Account in Your Pod
+
+Example Deployment YAML:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s3-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3-demo
+  template:
+    metadata:
+      labels:
+        app: s3-demo
+    spec:
+      serviceAccountName: s3-access-sa   # ✅ IRSA linked SA
+      containers:
+      - name: s3-demo
+        image: amazonlinux:2
+        command: ["sleep", "3600"]
+
+Step 4️⃣ — Use AWS CLI or SDK inside Pod
+
+You can now exec into the pod and use the AWS CLI without access keys:
+
+kubectl exec -it <pod-name> -- bash
+yum install -y awscli
+aws s3 ls s3://my-dev-bucket
+
+
+✅ That’s it — no secrets, no imagePullSecrets, no manual login.
+============================================================================================
+kubectl get pods
+kubectl describe pod <pod-name> | grep -i image
